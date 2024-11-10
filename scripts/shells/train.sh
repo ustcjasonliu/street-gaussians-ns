@@ -15,5 +15,5 @@ CUDA_VISIBLE_DEVICES=$cuda_id  sgn-train street-gaussians-ns \
     --max_2D_matches_per_3D_point 0 \
     --undistort True \
     --segments-path segs \
-    --filter_camera_id 2 3 \
+    --filter_camera_id 0 1 4 \
     --init_points_filename points3D.txt

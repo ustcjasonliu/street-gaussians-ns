@@ -251,6 +251,7 @@ class ColmapDataParser(DataParser):
                     continue
                 if self.config.filter_camera_id and camera_id not in self.config.filter_camera_id:
                     continue
+                print("i ", i, " path ". path, " filter_camera_id ",filter_camera_id)
                 indices.append(i)
 
             indices = np.array(indices, dtype=np.int32)

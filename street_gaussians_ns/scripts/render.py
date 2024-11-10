@@ -115,7 +115,7 @@ class DatasetRender(BaseRender):
         )
         data_manager_config = config.pipeline.datamanager
         assert isinstance(data_manager_config, (VanillaDataManagerConfig, FullImageDatamanagerConfig))
-
+        print("split  ", self.split)
         for split in self.split.split("+"):
             datamanager: VanillaDataManager
             dataset: Dataset
@@ -298,7 +298,6 @@ class DatasetRender(BaseRender):
             for i, image_path in enumerate(dataparser_outputs.image_filenames):
                 if not p.match(image_path.as_posix()):
                     continue
-
                 ca2w = cameras.camera_to_worlds[i]
                 row = torch.tensor([0,0,0,1], dtype=ca2w.dtype, device=ca2w.device).reshape((1,4))
                 ca2w = torch.cat([ca2w, row])
