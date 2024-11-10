@@ -75,7 +75,7 @@ class ColmapDataParserConfig(DataParserConfig):
     """
     train_split_fraction: float = 0.9
     """The fraction of images to use for training. The remaining images are for eval."""
-    eval_interval: int = 8
+    eval_interval: int = 10
     """The interval between frames to use for eval. Only used when eval_mode is eval-interval."""
     filter_camera_id: Optional[List[int]] = None
     """Filter images by camera id, None or empty list means no need to filter."""
@@ -87,7 +87,7 @@ class ColmapDataParserConfig(DataParserConfig):
     """Path to segments directory. If not set, segments are not loaded."""
     colmap_path: Path = Path("colmap/sparse/0")
     """Path to the colmap reconstruction directory relative to the data path."""
-    init_points_filename: str = "points3D.bin"
+    init_points_filename: str = "points3D.txt"
     """Specify the init points filename."""
     meta_file: Path = Path("transform.json")
     """meta file name."""
@@ -227,6 +227,7 @@ class ColmapDataParser(DataParser):
         return out
 
     def _get_image_indices(self, image_filenames, camera_ids, split):
+        print("split ", split)
         has_split_files_spec = (
             (self.config.data / "train_list.txt").exists()
             or (self.config.data / "test_list.txt").exists()
@@ -279,6 +280,7 @@ class ColmapDataParser(DataParser):
             i_train = np.linspace(
                 0, num_images - 1, num_train_images, dtype=int
             )  # equally spaced training images starting and ending at 0 and num_images-1
+            print("i train ", i_train)
             i_eval = np.setdiff1d(i_all, i_train)  # eval images are the remaining images
             assert len(i_eval) == num_eval_images
             if split == "train":
@@ -475,6 +477,7 @@ class ColmapDataParser(DataParser):
 
     def _load_3D_points(self, colmap_path: Path, transform_matrix: torch.Tensor, scale_factor: float):
         points_filepath = colmap_path / self.config.init_points_filename
+        print(f"points_filepath {points_filepath}")
         assert points_filepath.exists()
         if points_filepath.suffix == ".bin":
             colmap_points = colmap_utils.read_points3D_binary(points_filepath)

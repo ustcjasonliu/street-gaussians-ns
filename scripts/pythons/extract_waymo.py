@@ -4,7 +4,7 @@ from typing import List, Dict, Any
 import argparse
 import json
 import traceback
-
+import sys
 from scipy.spatial.transform import Rotation as R
 from waymo_open_dataset import dataset_pb2, label_pb2
 from waymo_open_dataset.utils import frame_utils
@@ -23,7 +23,7 @@ class WaymoDataExtractor:
 
     MIN_MOVING_SPEED = 0.2
 
-    def __init__(self, waymo_root: Path | str, num_workers: int) -> None:
+    def __init__(self, waymo_root: Path or str, num_workers: int) -> None:
         self.waymo_root = Path(waymo_root)
         self.num_workers = num_workers
 
@@ -35,7 +35,7 @@ class WaymoDataExtractor:
             label_pb2.Label.Type.TYPE_CYCLIST: "cyclist",
         }
 
-    def extract_all(self, split: str, specify_segments: List[str], out_root: Path | str):
+    def extract_all(self, split: str, specify_segments: List[str], out_root: Path or str):
         all_segments = self.list_segments()
 
         def find_segement(partial_segment_name: str, segments: List[Path]):
@@ -47,6 +47,7 @@ class WaymoDataExtractor:
         inexist_segs, task_segs = [], []
         if specify_segments:
             for specify_segment in specify_segments:
+                print(" specify_segment ", specify_segment, "all segments ", all_segments)
                 seg = find_segement(specify_segment, all_segments)
                 if seg is None:
                     inexist_segs.append(specify_segment)
@@ -94,8 +95,9 @@ class WaymoDataExtractor:
             print(seg.as_posix())
 
     def list_segments(self, split=None) -> List[str]:
+        print("self.waymo_root ", self.waymo_root)
         if split is None:
-            return list(self.waymo_root.glob("*/*.tfrecord"))
+            return list(self.waymo_root.glob("*.tfrecord"))
         else:
             return list((self.waymo_root / split).glob("*.tfrecord"))
 
@@ -146,6 +148,7 @@ class WaymoDataExtractor:
             distortion = intrinsic[4:]
 
             extrinsic = np.array(camera_calib.extrinsic.transform).reshape((4, 4))
+            extrinsic[1,3] += 0.5
             # convert waymo camera coord to opencv camera coord.
             opencv2waymo = np.array([[0, 0, 1], [-1, 0, 0], [0, -1, 0]])
             extrinsic[:3, :3] = extrinsic[:3, :3] @ opencv2waymo
@@ -301,11 +304,18 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--waymo_root", type=str, required=True)
     parser.add_argument("--out_root", type=str, required=True)
-    parser.add_argument("--split", default="training", const="training", nargs="?", choices=["training", "testing", "validation"])
-    parser.add_argument("--specify_segments", default=[], nargs="+")
+    parser.add_argument("--split", default="tfrecord_validation", const="training", nargs="?", choices=["training", "testing", "validation"])
+    parser.add_argument("--specify_segments_file", type=str, required=True)
     parser.add_argument("--num_workers", type=int, default=8)
 
     args = parser.parse_args()
 
+    specify_segments = []
+    print("specify_segments_file ", args.specify_segments_file)
+    with open(args.specify_segments_file, 'r', encoding='utf-8') as file:
+        specify_segments = [line.strip() for line in file]
+    print("specify_segments", specify_segments)
     extractor = WaymoDataExtractor(args.waymo_root, args.num_workers)
-    extractor.extract_all(args.split, args.specify_segments, args.out_root)
+    extractor.extract_all(args.split, specify_segments, args.out_root)
+    print("====Finish====")
+    sys.exit(1)

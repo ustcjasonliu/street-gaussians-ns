@@ -5,18 +5,18 @@ python scripts/pythons/transform2colmap.py \
 
 mkdir $DATASET_PATH/colmap
 
-colmap feature_extractor \
+/usr/local/bin/colmap feature_extractor \
    --database_path $DATASET_PATH/colmap/database.db \
    --image_path $DATASET_PATH/images \
    --ImageReader.mask_path $DATASET_PATH/masks \
 
-colmap exhaustive_matcher \
+/usr/local/bin/colmap exhaustive_matcher \
     --database_path $DATASET_PATH/colmap/database.db
 
 mkdir $DATASET_PATH/colmap/sparse
 mkdir $DATASET_PATH/colmap/sparse/not_align
 
-colmap mapper \
+/usr/local/bin/colmap mapper \
     --database_path $DATASET_PATH/colmap/database.db \
     --image_path $DATASET_PATH/images \
     --output_path $DATASET_PATH/colmap/sparse/not_align \
@@ -32,7 +32,7 @@ colmap mapper \
     --Mapper.ba_global_points_freq 35000 \
     --Mapper.filter_min_tri_angle 0.1 \
 
-colmap model_comparer \
+/usr/local/bin/colmap model_comparer \
     --input_path1 $DATASET_PATH/colmap/sparse/not_align/0 \
     --input_path2 $DATASET_PATH/colmap/sparse/origin \
     --output_path $DATASET_PATH/colmap/sparse/0 \
@@ -40,7 +40,7 @@ colmap model_comparer \
     
 # rm -rf $DATASET_PATH/colmap/sparse/not_align
 
-colmap point_triangulator \
+/usr/local/bin/colmap point_triangulator \
     --database_path $DATASET_PATH/colmap/database.db \
     --image_path $DATASET_PATH/images \
     --input_path $DATASET_PATH/colmap/sparse/origin \

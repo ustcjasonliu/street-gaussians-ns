@@ -138,6 +138,7 @@ class BBoxOptimizer(nn.Module):
         return functools.reduce(pose_utils.multiply, outputs)
 
     def apply_to_bbox(self, bbox: Box) -> None:
+        # not entrance
         """Apply the pose correction to the bbox"""
         if self.config.mode != "off":
             origin_centers = torch.from_numpy(bbox.center).to(self.device)

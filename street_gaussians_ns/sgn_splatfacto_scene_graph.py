@@ -8,7 +8,7 @@ import math
 from gsplat.sh import spherical_harmonics
 from pytorch3d.transforms import quaternion_multiply
 from torch.nn import Parameter
-import mediapy as media
+# import mediapy as media
 import torch
 import torchvision.transforms.functional as TF
 
