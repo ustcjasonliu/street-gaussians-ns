@@ -1,0 +1,2 @@
+bash scripts/shells/train.sh data/minor/tfrecord_validation/13085453465864374565_2040_000_2060_000 1
+bash scripts/shells/train.sh data/minor/tfrecord_validation/13142190313715360621_3888_090_3908_090  1
